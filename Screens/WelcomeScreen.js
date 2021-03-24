@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import firebase from "firebase";
-import db from "../config"
+import db from "../config";
 
 class WelcomeScreen extends Component {
   constructor(props) {
@@ -22,9 +22,16 @@ class WelcomeScreen extends Component {
       isModalVisible: false,
       firstName: "",
       lastName: "",
+      docID: null,
     };
   }
+  CreateUniqueId = () => {
+    return Math.random().toString(36).substring(7);
+  };
   userSignUp = () => {
+    var data = [
+      { Credit: [{ amt: 0, des: "" }], Debit: [{ amt: 0, des: "" }] },
+    ];
     if (this.state.password !== this.state.confirmPassword) {
       return Alert.alert("password doesn't match\nCheck your password.");
     } else {
@@ -36,7 +43,20 @@ class WelcomeScreen extends Component {
             first_name: this.state.firstName,
             last_name: this.state.lastName,
             email_id: this.state.mail,
+            Credit: [],
+            Debit: [],
           });
+          db.collection("users");
+          db.collection("methods").add({
+            mailId: this.state.mail,
+            methods: ["Cash"],
+          });
+          db.collection("methods")
+            .doc("Zamj9FbUPXMzLc8ERHRI")
+            .collection("Cash")
+            .doc(CreateUniqueId())
+            .set(data);
+
           return Alert.alert("User Added Successfully", "", [
             {
               text: "OK",
@@ -51,10 +71,12 @@ class WelcomeScreen extends Component {
     }
   };
 
+  findUser = () => {};
+
   signIn = async () => {
     var mail = this.state.mail;
     var password = this.state.password;
-    console.log(mail)
+    console.log(mail);
     firebase
       .auth()
       .signInWithEmailAndPassword(mail, password)
